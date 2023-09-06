@@ -1,0 +1,59 @@
+
+
+<div> 
+
+    <div class="welcome-message d-flex align-items-center">
+        <p>Bienvenido </p>
+        <p></p>
+        <p>{{username}}</p>
+        <p> {{user.email}}   </p>
+        <p></p>
+         {{#if user.admin}}
+            <p>Rol:&nbsp;Administrador</p>
+          {{else}}
+              <p>Rol:&nbsp;Usuario</p>
+        {{/if}}
+        <a  id="logout-button" class="btn btn-secondary m-2 ml-10 ">Cerrar Sesión</a>
+
+    </div>
+   
+
+    <div id="product-list" class="d-flex flex-row flex-wrap">
+    {{#each products}}
+      <div class="card m-2 mb-10 p-5">
+        <div class="card-body">
+          <h2 class="card-title">{{this.name}}</h2>
+          <p class="card-text">Categoría: {{category}}</p>
+          <p class="card-text">Disponibilidad: {{availability}}</p>
+          <p class="card-text">Precio: {{price}}</p>
+          {{!-- <button type="button" class="btn btn-secondary add-to-cart-button" id="{{_id}}">Agregar al Carrito</button>
+          <button type="button" class="btn btn-secondary view-details-button" id="{{_id}}">Ver Detalles</button> --}}
+        </div>
+      </div>
+    {{/each}}
+  </div>
+
+
+
+  <div id="paginated">
+    <p>Page {{ pagination.currentPage }} of {{ pagination.totalPages }}</p>
+  
+      {{#if pagination.hasPrevPage}}
+        <a href="{{ pagination.prevLink }}">Anterior</a>
+      {{/if}}
+  
+       {{#if pagination.hasNextPage}}
+        <a href="{{ pagination.nextLink }}">Siguiente</a>
+      {{/if}}
+  </div>
+
+</div>
+ 
+ <script src="/js/product.js"></script>
+ <script src="/js/logout.js"></script>
+   
+
+
+
+
+
