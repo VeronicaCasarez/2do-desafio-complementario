@@ -2,10 +2,10 @@ import { Router } from "express";
 import mongoose from "mongoose";
 import { __dirname } from "../utils.js";
 import * as dotenv from "dotenv";
-import ProductModel from "../models/product.model.js"; 
-import UserModel from "../models/user.model.js"
+import ProductModel from "../dao/models/product.model.js";
+import UserModel from "../dao/models/user.model.js"
 import { isLoggedIn } from "./middlewares.routes.js";
-import productsModel from "../models/product.model.js";
+
 
 const router = Router();
 

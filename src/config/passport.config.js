@@ -1,6 +1,6 @@
 import passport from "passport";
 import local from "passport-local";
-import UserModel from "../models/user.model.js";
+import UserModel from "../dao/models/user.model.js";
 import GitHubStrategy from "passport-github2";
 import { createHash,isValidPassword } from "../utils.js";
 import jwt, { ExtractJwt } from "passport-jwt";
@@ -38,7 +38,7 @@ const initializePassport = () => {
           try {
             //validar que el usuario exista en la base de datos
             console.log("jwt_payload", jwt_payload);
-            let response = await UserModel.findOne({
+            let response = await UserModel.find({
               email: jwt_payload.user.username,
             });
             if (!response) {
@@ -54,8 +54,6 @@ const initializePassport = () => {
     );
   
   
- 
-
   passport.use(
     "github",
     new GitHubStrategy(
@@ -130,26 +128,25 @@ const initializePassport = () => {
   
     //estrategia para el login
     passport.use(
-        "login",
-        new LocalStrategy(
-            async ( username, password, done) => {
-            try {
-              const user = await UserModel.findOne({ email:username});
-              if (!user) {
-                console.log("usuario no existe")
-                return done(null, false, { message: "User not found" });
-              }
-                if (!isValidPassword(user.password, password)) {
-                return done(null, false, { message: "Wrong password" });
-              } else {
-                return done(null, user);
-              }
-            } catch (error) {
-                return done("Error al obtener el usuario", error);
+      "login",
+      new LocalStrategy(
+        async (username, password, done) => {
+          try {
+            const user = await UserModel.findOne({ email: username });
+            if (!user) {
+              return done(null, false, { message: "User not found" });
             }
+            if (!isValidPassword(user.password, password)) {
+              return done(null, false, { message: "Wrong password" });
+            }
+            return done(null, user); 
+          } catch (error) {
+            return done(error); 
           }
-        )
-      );
+        }
+      )
+    );
+    
       passport.serializeUser((user, done) => {
         done(null, user._id);
       });

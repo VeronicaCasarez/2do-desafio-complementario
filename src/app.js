@@ -53,7 +53,7 @@ app.use(
         useNewUrlParser: true,
         useUnifiedTopology: true,
       },
-      ttl: 100,
+      ttl: 10,
     }),
     secret: "codersecret",
     resave: false,

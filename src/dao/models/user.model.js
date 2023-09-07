@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   age: Number,
   password: String, 
-  cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
+  cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Carts' },
   role: { type: String, default: 'user' },
 });
   

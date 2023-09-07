@@ -10,8 +10,9 @@ async function postLogin(username, password) {
   });
 
   const result = await response.json();
+     // return result;
 
-  if (result.response === "Loggeg in!") {
+  if (result.respuesta === "Autenticado exitosamente") {
         window.location.href = "/api/products"; 
     
        } else {

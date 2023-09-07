@@ -1,78 +1,102 @@
 import { Router } from "express";
-import UserModel from "../models/user.model.js";
+import UserModel from "../dao/models/user.model.js";
 import notifier from 'node-notifier';
-import { createHash ,generateToken, isValidPassword} from "../utils.js";
+import { passportCall,createHash ,authorization,generateToken, isValidPassword} from "../utils.js";
 import passport from "passport";
 
 
 const router = Router();
-
+//Login con jwt   
 router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    res.status(400).json({
-      message: "error",
-      data: "Faltan campos",
-    });
-  }
-  let result = await UserModel.find({
-    email: username,
-  });
-  //console.log("aaaaaaaaa", result);
-  if (result) {
-    const role = "admin";
-    const myToken = generateToken({ username, password, role });
-    /* res.status(200).json({
-        message: "success",
-        token: myToken,
-      });
-       } else {
-      res.status(400).json({
-        message: "error",
-        data: "Credenciales invalidas",
-      });
-    }*/
-    res
-      .cookie("CoderKeyQueNadieDebeSaber", myToken, {
-        maxAge: 60 * 60 * 1000,
-      })
-      .send({ response: "Loggeg in!" });
+  const { username, password } = req.body
+  const user = await UserModel.findOne({ email: username })
+  console.log("usuario",user)
+  if (!user) {
+      return res.json({ status: "error", message: "User not found" })
   } else {
-    res.status(401).json({
-      message: "error",
-      data: "Usuario o contraseña incorrectos",
-    });
+          const myToken = generateToken(user)
+          res
+          .cookie("CoderKeyQueNadieDebeSaber", myToken, {
+              maxAge: 60 * 60 * 1000,
+              httpOnly: true
+          })
+          .json({ status: "success" , respuesta: "Autenticado exitosamente" })
+      }
   }
-});
+)
+
+
+// router.get("/current", passportCall("jwt"), authorization("user"), (req, res) => {
+//   res.send(req.user)
+// })
+
+// router.post("/login", async (req, res) => {
+//   const { username, password } = req.body;
+//   if (!username || !password) {
+//     res.status(400).json({
+//       message: "error",
+//       data: "Faltan campos",
+//     });
+//   }
+//   let result = await UserModel.find({
+//     email: username,
+//   });
+//   //console.log("aaaaaaaaa", result);
+//   if (result) {
+//     const role = "admin";
+//     const myToken = generateToken({ username, password, role });
+//     /* res.status(200).json({
+//         message: "success",
+//         token: myToken,
+//       });
+//        } else {
+//       res.status(400).json({
+//         message: "error",
+//         data: "Credenciales invalidas",
+//       });
+//     }*/
+//     res
+//       .cookie("CoderKeyQueNadieDebeSaber", myToken, {
+//         maxAge: 60 * 60 * 1000,
+//       })
+//       // .send({ response: "Loggeg in!" })
+//       .json({ status: "success" , respuesta: "Autenticado exitosamente" })
+//   } else {
+//     res.status(401).json({
+//       message: "error",
+//       data: "Usuario o contraseña incorrectos",
+//     });
+//   }
+// });
 
 
 //ruta para el login usando passport y faillogin
-// router.post(
-//   "/login",
-//   passport.authenticate("login", {
-//     failureRedirect: "/failLogin",
-//   }),
-//   async (req, res) => {
-//     if (!req.user) {
-//       return res.status(401).json("error de autenticacion");
-//     }
+router.post(
+  "/login",
+  passport.authenticate("login", {
+    failureRedirect: "/failLogin",
+  }),
+  async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json("error de autenticacion");
+    }
     
-//     req.session.user = {
-//       first_name: req.user.first_name,
-//       last_name: req.user.last_name,
-//       email: req.user.email,
-//       age: req.user.age,
-//     };
-//     req.session.admin = true;
-//     res.status(200).json({ respuesta: "Autenticado exitosamente" });
-//   // res.send({ status: "success", mesage: "user logged", user: req.user });
-//   }
-// );
+    req.session.user = {
+      first_name: req.user.first_name,
+      last_name: req.user.last_name,
+      email: req.user.email,
+      age: req.user.age,
+    };
+    // req.session.admin = true;
+    res.status(200).json({ respuesta: "Autenticado exitosamente" });
+  // res.send({ status: "success", mesage: "user logged", user: req.user });
+  }
+);
 
-// router.get("/failLogin", async (req, res) => {
-//   console.log("failed strategy");
-//   res.send({ error: "failed" });
-// });
+router.get("/failLogin", async (req, res) => {
+  console.log("failed strategy");
+  res.send({ error: "failed" });
+});
 
 
 //ruta del login sin passport
